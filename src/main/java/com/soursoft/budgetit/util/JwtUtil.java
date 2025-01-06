@@ -17,24 +17,28 @@ public class JwtUtil {
 
     private JwtConfig configuration;
 
-    private SecretKey key = Keys.hmacShaKeyFor(configuration.getSecret().getBytes());
-
     public JwtUtil(JwtConfig configuration) {
         this.configuration = configuration;
     }
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(configuration.getSecret().getBytes());
+    }
+
+
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + configuration.getExpiration()))
-                .signWith(key, Jwts.SIG.HS512)
+                .signWith(getSigningKey(), Jwts.SIG.HS512)
                 .compact();
     }
 
     public Claims extractClaims(String token) {
         return Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
