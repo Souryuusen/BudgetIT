@@ -1,7 +1,10 @@
 package com.soursoft.budgetit.controllers;
 
+import com.soursoft.budgetit.dto.auth.PostLoginRequestDTO;
 import com.soursoft.budgetit.dto.auth.PostLoginResponseDTO;
+import com.soursoft.budgetit.dto.auth.PostLogoutRequestDTO;
 import com.soursoft.budgetit.dto.auth.PostRefreshRequestDTO;
+import com.soursoft.budgetit.dto.auth.PostRefreshResponseDTO;
 import com.soursoft.budgetit.dto.auth.PostRegisterRequestDTO;
 import com.soursoft.budgetit.dto.auth.PostRegisterResponseDTO;
 import com.soursoft.budgetit.entities.UserEntity;
@@ -44,7 +47,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<PostLoginResponseDTO> login(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<PostLoginResponseDTO> login(@RequestBody PostLoginRequestDTO loginRequestDTO) {
+        String username = loginRequestDTO.getUsername();
+        String password = loginRequestDTO.getPassword();
+
         Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         UserEntity foundUser = userService.findUserByUsername(username);
 
@@ -61,7 +67,7 @@ public class AuthController {
 
     @Transactional
     @PostMapping("/refresh")
-    public ResponseEntity<PostLoginResponseDTO> refreshToken(@RequestBody PostRefreshRequestDTO postRefreshRequestDTO) {
+    public ResponseEntity<PostRefreshResponseDTO> refreshToken(@RequestBody PostRefreshRequestDTO postRefreshRequestDTO) {
         Optional<RefreshTokenEntity> foundToken = refreshTokenService.findRefreshTokenByToken(postRefreshRequestDTO.getRefreshToken());
 
         if(foundToken.isPresent()) {
@@ -76,19 +82,26 @@ public class AuthController {
 
                 refreshTokenService.saveRefreshToken(newToken);
 
-                return ResponseEntity.ok(new PostLoginResponseDTO(accessToken, refreshToken));
+                return ResponseEntity.ok(new PostRefreshResponseDTO(accessToken, refreshToken));
             }
         }
 
         return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
-    @PostMapping("register")
-    public PostRegisterResponseDTO register(@RequestBody PostRegisterRequestDTO registerData) {
-        userService.registerUser(registerData);
+    @PostMapping("/register")
+    public PostRegisterResponseDTO register(@RequestBody PostRegisterRequestDTO registerDataDTO) {
 
+        return userService.registerUser(registerDataDTO);
+    }
 
-        return userService.registerUser(registerData);
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody PostLogoutRequestDTO logoutRequestDTO) {
+        UserEntity userEntity = userService.findUserByUsername(logoutRequestDTO.getUsername());
+        refreshTokenService.deleteAllRefreshTokensByUser(userEntity);
+
+        return ResponseEntity.ok("User logged out");
+
     }
 
 
