@@ -3,7 +3,7 @@ package com.soursoft.budgetit.controllers;
 import com.soursoft.budgetit.dto.PostRegisterRequestDTO;
 import com.soursoft.budgetit.dto.PostRegisterResponseDTO;
 import com.soursoft.budgetit.services.UserService;
-import com.soursoft.budgetit.util.JwtUtil;
+import com.soursoft.budgetit.util.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,13 +19,13 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
 
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
 
     private UserService userService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserService userService) {
+    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, UserService userService) {
         this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
+        this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
     }
 
@@ -38,8 +38,9 @@ public class AuthController {
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password) {
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(username, password));
-        return jwtUtil.generateToken(username);
+            new UsernamePasswordAuthenticationToken(username, password));;
+
+        return jwtTokenProvider.generateToken(username);
     }
 
     @PostMapping("register")

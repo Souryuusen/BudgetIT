@@ -3,29 +3,24 @@ package com.soursoft.budgetit.util;
 import com.soursoft.budgetit.config.JwtConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Component
-public class JwtUtil {
+public class JwtTokenProvider {
 
     private JwtConfig configuration;
 
-    public JwtUtil(JwtConfig configuration) {
+    public JwtTokenProvider(JwtConfig configuration) {
         this.configuration = configuration;
     }
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(configuration.getSecret().getBytes());
     }
-
-
 
     public String generateToken(String username) {
         return Jwts.builder()

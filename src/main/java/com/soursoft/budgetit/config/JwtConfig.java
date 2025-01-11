@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class JwtConfig {
 
     private long expiration;
+    private long refresh;
     private String secret;
 
     public long getExpiration() {
@@ -18,6 +19,14 @@ public class JwtConfig {
 
     public void setExpiration(long expiration) {
         this.expiration = expiration;
+    }
+
+    public long getRefresh() {
+        return refresh;
+    }
+
+    public void setRefresh(long refresh) {
+        this.refresh = refresh;
     }
 
     public String getSecret() {
