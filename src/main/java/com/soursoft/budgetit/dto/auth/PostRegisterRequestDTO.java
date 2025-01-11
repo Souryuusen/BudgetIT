@@ -1,4 +1,4 @@
-package com.soursoft.budgetit.dto;
+package com.soursoft.budgetit.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

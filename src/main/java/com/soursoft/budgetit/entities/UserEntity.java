@@ -1,5 +1,6 @@
 package com.soursoft.budgetit.entities;
 
+import com.soursoft.budgetit.entities.auth.RefreshTokenEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.Setter;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -40,7 +42,10 @@ public class UserEntity {
     @Getter
     private LocalDateTime removalDate;
 
-    @Getter @Setter
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RefreshTokenEntity> refreshTokens;
+
+    @Data
     public static class UserEntityBuilder {
 
         private Boolean active;

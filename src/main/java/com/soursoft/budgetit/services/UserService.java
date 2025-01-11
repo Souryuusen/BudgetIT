@@ -1,11 +1,12 @@
 package com.soursoft.budgetit.services;
 
-import com.soursoft.budgetit.dto.PostRegisterRequestDTO;
-import com.soursoft.budgetit.dto.PostRegisterResponseDTO;
+import com.soursoft.budgetit.dto.auth.PostRegisterRequestDTO;
+import com.soursoft.budgetit.dto.auth.PostRegisterResponseDTO;
 import com.soursoft.budgetit.entities.UserEntity;
 import com.soursoft.budgetit.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,12 @@ public class UserService {
         }
 
         return PostRegisterResponseDTO.fromEntity(newUser);
+    }
+
+    public UserEntity findUserByUsername(String username) {
+        Optional<UserEntity> foundUser = userRepository.findUserEntityByUsername(username);
+
+        return foundUser.orElseThrow(() -> new UsernameNotFoundException("Username " + username + " not found!"));
     }
 
 }
