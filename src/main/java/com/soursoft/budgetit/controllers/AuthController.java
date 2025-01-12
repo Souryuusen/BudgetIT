@@ -1,12 +1,12 @@
 package com.soursoft.budgetit.controllers;
 
-import com.soursoft.budgetit.dto.auth.PostLoginRequestDTO;
-import com.soursoft.budgetit.dto.auth.PostLoginResponseDTO;
-import com.soursoft.budgetit.dto.auth.PostLogoutRequestDTO;
-import com.soursoft.budgetit.dto.auth.PostRefreshRequestDTO;
-import com.soursoft.budgetit.dto.auth.PostRefreshResponseDTO;
-import com.soursoft.budgetit.dto.auth.PostRegisterRequestDTO;
-import com.soursoft.budgetit.dto.auth.PostRegisterResponseDTO;
+import com.soursoft.budgetit.dto.auth.login.PostLoginRequestDTO;
+import com.soursoft.budgetit.dto.auth.login.PostLoginResponseDTO;
+import com.soursoft.budgetit.dto.auth.logout.PostLogoutRequestDTO;
+import com.soursoft.budgetit.dto.auth.refresh.PostRefreshRequestDTO;
+import com.soursoft.budgetit.dto.auth.refresh.PostRefreshResponseDTO;
+import com.soursoft.budgetit.dto.auth.register.PostRegisterRequestDTO;
+import com.soursoft.budgetit.dto.auth.register.PostRegisterResponseDTO;
 import com.soursoft.budgetit.entities.UserEntity;
 import com.soursoft.budgetit.entities.auth.RefreshTokenEntity;
 import com.soursoft.budgetit.services.RefreshTokenService;
@@ -21,7 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
@@ -72,8 +71,9 @@ public class AuthController {
 
         if(foundToken.isPresent()) {
             RefreshTokenEntity tokenEntity = foundToken.get();
+
+            UserEntity tokenUser = tokenEntity.getUser();
             if (!jwtTokenProvider.isTokenExpired(tokenEntity.getToken())) {
-                UserEntity tokenUser = tokenEntity.getUser();
 
                 String accessToken = jwtTokenProvider.generateAccessToken(tokenUser);
 
@@ -83,6 +83,8 @@ public class AuthController {
                 refreshTokenService.saveRefreshToken(newToken);
 
                 return ResponseEntity.ok(new PostRefreshResponseDTO(accessToken, refreshToken));
+            } else {
+                refreshTokenService.deleteAllRefreshTokensByUser(tokenUser);
             }
         }
 

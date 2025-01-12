@@ -1,7 +1,7 @@
 package com.soursoft.budgetit.services;
 
-import com.soursoft.budgetit.dto.auth.PostRegisterRequestDTO;
-import com.soursoft.budgetit.dto.auth.PostRegisterResponseDTO;
+import com.soursoft.budgetit.dto.auth.register.PostRegisterRequestDTO;
+import com.soursoft.budgetit.dto.auth.register.PostRegisterResponseDTO;
 import com.soursoft.budgetit.entities.UserEntity;
 import com.soursoft.budgetit.repositories.UserRepository;
 import jakarta.transaction.Transactional;

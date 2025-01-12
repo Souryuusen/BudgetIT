@@ -42,6 +42,9 @@ public class UserEntity {
     @Getter
     private LocalDateTime removalDate;
 
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAccount> accounts;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshTokenEntity> refreshTokens;
 

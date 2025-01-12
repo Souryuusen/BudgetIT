@@ -1,4 +1,4 @@
-package com.soursoft.budgetit.dto.auth;
+package com.soursoft.budgetit.dto.auth.refresh;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,9 +6,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor @AllArgsConstructor
-public class PostRefreshResponseDTO {
+public class PostRefreshRequestDTO {
 
-    private String accessToken;
     private String refreshToken;
 
 }

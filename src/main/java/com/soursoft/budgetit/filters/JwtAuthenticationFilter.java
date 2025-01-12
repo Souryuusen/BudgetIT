@@ -2,6 +2,7 @@ package com.soursoft.budgetit.filters;
 
 import com.soursoft.budgetit.config.JwtConfig;
 import com.soursoft.budgetit.services.CustomUserDetailsService;
+import com.soursoft.budgetit.util.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -27,13 +28,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
 
     private final JwtConfig tokenConfig;
+    private final JwtTokenProvider tokenProvider;
 
-    public JwtAuthenticationFilter(CustomUserDetailsService customUserDetailsService, JwtConfig tokenConfig) {
+    public JwtAuthenticationFilter(CustomUserDetailsService customUserDetailsService, JwtConfig tokenConfig,
+                                    JwtTokenProvider tokenProvider) {
         this.customUserDetailsService = customUserDetailsService;
         this.tokenConfig = tokenConfig;
+        this.tokenProvider = tokenProvider;
     }
 
-    private SecretKey getSigningKey() {
+    private final SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(tokenConfig.getSecret().getBytes());
     }
 
@@ -61,11 +65,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String username = tokenClaims.getSubject();
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-            if(userDetails.isEnabled()) {
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails,
-                                                        null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            if(tokenProvider.isTokenValid(authToken, username)) {
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+                if (userDetails.isEnabled()) {
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails,
+                        null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
         }
 
