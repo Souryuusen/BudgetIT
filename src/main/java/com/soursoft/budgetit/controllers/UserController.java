@@ -56,11 +56,12 @@ public class UserController {
         } else {
             if(foundUser != null) {
                 throw new RuntimeException("Cannot create new account for non-active user!");
+            } else {
+                throw new RuntimeException("User with id " + userId + " has not been found");
             }
         }
-
-
-        return null;
     }
+
+//    public ResponseEntity<?>
 
 }
