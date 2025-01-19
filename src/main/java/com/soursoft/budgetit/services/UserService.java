@@ -59,4 +59,11 @@ public class UserService {
         return foundUser.orElseThrow(() -> new UsernameNotFoundException("Username " + username + " not found!"));
     }
 
+    //TODO: Create custom exception for handling 'UserEntity Not Found'
+    public UserEntity findUserByUserId(Long userId) {
+        Optional<UserEntity> foundUser = userRepository.findById(userId);
+
+        return foundUser.orElseThrow(() -> new UsernameNotFoundException("Username with id " + userId + " not found!"));
+    }
+
 }

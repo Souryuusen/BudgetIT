@@ -36,5 +36,21 @@ public class UserAccount {
     @OneToMany(mappedBy = "destinationAccount")
     private List<AccountTransaction> receiveTransactions;
 
+    public static class UserAccountBuilder {
+
+        private String name;
+
+        private BigDecimal currentBalance;
+
+        private UserEntity owner;
+
+        private List<AccountTransaction> sendTransactions;
+
+        private List<AccountTransaction> receivedTransactions;
+
+
+
+    }
+
 
 }
