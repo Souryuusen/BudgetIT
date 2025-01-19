@@ -1,11 +1,13 @@
 package com.soursoft.budgetit.controllers;
 
+import com.soursoft.budgetit.dto.users.userId.GetUserByIdResponseDTO;
 import com.soursoft.budgetit.dto.users.userId.PostCreateUserAccountRequestDTO;
 import com.soursoft.budgetit.dto.users.userId.PostCreateUserAccountResponseDTO;
 import com.soursoft.budgetit.entities.UserAccount;
 import com.soursoft.budgetit.entities.UserEntity;
 import com.soursoft.budgetit.services.UserAccountService;
 import com.soursoft.budgetit.services.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -28,10 +30,11 @@ public class UserController {
         this.userAccountService = userAccountService;
     }
 
-    @GetMapping
+    @GetMapping("/{userId}")
+    @Transactional
     public ResponseEntity<GetUserByIdResponseDTO> getUserById(@PathVariable Long userId) {
-
-        return null
+        UserEntity foundUser = userService.findUserByUserId(userId);
+        return ResponseEntity.ok(GetUserByIdResponseDTO.fromEntity(foundUser));
     }
 
     //TODO: Create custom exception for handling "User Not Active" situation

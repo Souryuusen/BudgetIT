@@ -1,5 +1,6 @@
 package com.soursoft.budgetit.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,6 +35,7 @@ public class UserAccount {
     @Column(name = "acc_removal_date")
     private LocalDateTime removalDate;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "acc_owner_id", nullable = false)
     private UserEntity owner;

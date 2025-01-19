@@ -1,5 +1,6 @@
 package com.soursoft.budgetit.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.soursoft.budgetit.entities.auth.RefreshTokenEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,7 @@ public class UserEntity {
     @Getter
     private LocalDateTime removalDate;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAccount> accounts;
 
