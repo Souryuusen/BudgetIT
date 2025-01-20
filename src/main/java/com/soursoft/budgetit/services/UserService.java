@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -20,11 +21,14 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final UserAccountService userAccountService;
+
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserAccountService userAccountService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.userAccountService = userAccountService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -42,6 +46,7 @@ public class UserService {
                 .withActive(true)
                 .withUsername(postRegisterRequestDTO.getUsername())
                 .withPassword(passwordEncoder.encode(postRegisterRequestDTO.getPassword()))
+                .withTotalBalance(new BigDecimal(0))
                 .withCreationDate(currentDate)
                 .withModificationDate(currentDate)
                 .withRemovalDate(null)
@@ -51,6 +56,24 @@ public class UserService {
         }
 
         return PostRegisterResponseDTO.fromEntity(newUser);
+    }
+
+    //TODO: Create custom exception for handling 'UserEntity Not Found'
+    @Transactional
+    public UserEntity updateUserTotalBalance(Long userId) {
+        Optional<UserEntity> foundUserOptional = userRepository.findById(userId);
+
+        if(foundUserOptional.isPresent()) {
+            UserEntity foundUser = foundUserOptional.get();
+
+            BigDecimal calculatedTotalBalance = userAccountService.calculateTotalBalanceByUserId(userId);
+            foundUser.setTotalBalance(calculatedTotalBalance);
+            updateEntity(foundUser);
+
+            return foundUser;
+        } else {
+            throw new UsernameNotFoundException("Username with id " + userId + " not found!");
+        }
     }
 
     public UserEntity findUserByUsername(String username) {
@@ -64,6 +87,13 @@ public class UserService {
         Optional<UserEntity> foundUser = userRepository.findById(userId);
 
         return foundUser.orElseThrow(() -> new UsernameNotFoundException("Username with id " + userId + " not found!"));
+    }
+
+    @Transactional
+    public UserEntity updateEntity(UserEntity entity) {
+        entity.setModificationDate(LocalDateTime.now());
+
+        return userRepository.save(entity);
     }
 
 }

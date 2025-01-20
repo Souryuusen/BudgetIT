@@ -1,6 +1,7 @@
 package com.soursoft.budgetit.controllers;
 
 import com.soursoft.budgetit.dto.users.userId.GetUserByIdResponseDTO;
+import com.soursoft.budgetit.dto.users.userId.PostChargeUserByUserIdRequestDTO;
 import com.soursoft.budgetit.dto.users.userId.PostCreateUserAccountRequestDTO;
 import com.soursoft.budgetit.dto.users.userId.PostCreateUserAccountResponseDTO;
 import com.soursoft.budgetit.entities.UserAccount;
@@ -48,6 +49,7 @@ public class UserController {
             UserAccount foundAccount = userAccountService.findAccountByOwnerAndName(foundUser, request.getName());
             if(foundAccount == null) {
                 UserAccount newAccount = userAccountService.createNewAccount(foundUser, request.getName(), request.getBalance());
+                userService.updateUserTotalBalance(userId);
 
                 return new ResponseEntity<>(PostCreateUserAccountResponseDTO.fromEntity(newAccount), HttpStatus.CREATED);
             } else {
@@ -60,6 +62,30 @@ public class UserController {
                 throw new RuntimeException("User with id " + userId + " has not been found");
             }
         }
+    }
+
+    @PostMapping("/{userId}/charge")
+    public ResponseEntity<?> chargeUser(@PathVariable Long userId, @RequestBody PostChargeUserByUserIdRequestDTO request) {
+        UserEntity foundUser = userService.findUserByUserId(userId);
+
+        Long accountId = request.getAccountId();
+        if((accountId == null || accountId <= 0) && request.getDividePayment()) {
+
+        } else if(request.getAccountId() != null) {
+            if(userAccountService.isValidUserAccount(accountId)) {
+                UserAccount account = userAccountService.findAccountByAccountId(accountId);
+
+                if(userAccountService.isBalanceSufficient(account, request.getAmount())) {
+                    account.setCurrentBalance(account.getCurrentBalance().subtract(request.getAmount()));
+                } else {
+                    throw new RuntimeException("Insufficient founds on selected account.");
+                }
+            } else {
+                throw new RuntimeException("Cannot find user account connected to User with id " + request.getAccountId());
+            }
+        }
+
+        return null;
     }
 
 //    public ResponseEntity<?>

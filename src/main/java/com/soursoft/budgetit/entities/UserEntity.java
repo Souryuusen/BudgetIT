@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,6 +33,9 @@ public class UserEntity {
     private String username;
     @Column(name = "user_pwd_hash")
     private String passwordHash;
+
+    @Column(name = "user_total_balance")
+    private BigDecimal totalBalance;
 
     @Column(name = "user_creation_date")
     @Getter
@@ -58,6 +62,8 @@ public class UserEntity {
         private String username;
         private String passwordHash;
 
+        private BigDecimal totalBalance;
+
         private LocalDateTime creationDate;
         private LocalDateTime modificationDate;
         private LocalDateTime removalDate;
@@ -69,6 +75,8 @@ public class UserEntity {
 
             this.username = null;
             this.passwordHash = null;
+
+            this.totalBalance = null;
 
             this.creationDate = null;
             this.modificationDate = null;
@@ -88,6 +96,8 @@ public class UserEntity {
             this.setUsername(null);
             this.setPasswordHash(null);
 
+            this.setTotalBalance(null);
+
             this.setCreationDate(null);
             this.setModificationDate(null);
             this.setRemovalDate(null);
@@ -102,6 +112,8 @@ public class UserEntity {
 
             userEntity.setUsername(this.getUsername());
             userEntity.setPasswordHash(this.getPasswordHash());
+
+            userEntity.setTotalBalance(this.getTotalBalance());
 
             userEntity.setCreationDate(this.getCreationDate());
             userEntity.setModificationDate(this.getCreationDate());
@@ -124,6 +136,12 @@ public class UserEntity {
 
         public UserEntityBuilder withPassword(String passwordHash) {
             this.setPasswordHash(passwordHash);
+
+            return this;
+        }
+
+        public UserEntityBuilder withTotalBalance(BigDecimal totalBalance) {
+            this.setTotalBalance(totalBalance);
 
             return this;
         }
