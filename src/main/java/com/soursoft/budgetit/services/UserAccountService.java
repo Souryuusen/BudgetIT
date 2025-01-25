@@ -23,20 +23,39 @@ public class UserAccountService {
     }
 
     //TODO: Add Validation For Method Arguments
-    public UserAccount createNewAccount(UserEntity owner, String accountName, BigDecimal startingBalance) {
-        LocalDateTime creationDate = LocalDateTime.now();
-        UserAccount newAccount = UserAccountBuilder.getInstance()
-            .withName(accountName)
-            .withCurrentBalance(startingBalance)
-            .withCreationDate(creationDate)
-            .withModificationDate(creationDate)
-            .withRemovalDate(null)
-            .withOwner(owner)
-            .build();
+    public UserAccount createNewAccount(UserEntity owner, String accountName, BigDecimal startingBalance, Boolean mainAccount) {
 
-        newAccount = userAccountRepository.save(newAccount);
+        UserAccount foundAccount = findAccountByOwnerAndName(owner,accountName);
 
-        return newAccount;
+        if(foundAccount == null) {
+            LocalDateTime creationDate = LocalDateTime.now();
+            UserAccount newAccount = UserAccountBuilder.getInstance()
+                .withMainAccount(mainAccount)
+                .withName(accountName)
+                .withCurrentBalance(startingBalance)
+                .withCreationDate(creationDate)
+                .withModificationDate(creationDate)
+                .withRemovalDate(null)
+                .withOwner(owner)
+                .build();
+            newAccount = userAccountRepository.save(newAccount);
+
+            final long newAccountId = newAccount.getAccountId();
+
+            if(mainAccount) {
+                owner.getAccounts()
+                    .stream()
+                    .filter(account -> account.getAccountId() != newAccountId)
+                    .forEach((account -> {
+                        account.setMainAccount(false);
+                        updateEntity(account);
+                    }));
+            }
+
+            return newAccount;
+        } else {
+            throw new RuntimeException("User Already Have Account With Specified Name");
+        }
     }
 
     @Transactional
@@ -76,6 +95,12 @@ public class UserAccountService {
 
     public Boolean isBalanceSufficient(UserAccount account, BigDecimal amountToCharge) {
         return account.getCurrentBalance().min(amountToCharge).compareTo(BigDecimal.ZERO) >= 0;
+    }
+
+    public UserAccount updateEntity(UserAccount entity) {
+        entity.setModificationDate(LocalDateTime.now());
+
+        return userAccountRepository.save(entity);
     }
 
 

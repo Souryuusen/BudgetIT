@@ -1,17 +1,17 @@
-package com.soursoft.budgetit.dto.users.userId;
+package com.soursoft.budgetit.dto.accounts;
 
+import com.soursoft.budgetit.dto.users.userId.PostCreateUserAccountResponseDTO;
 import com.soursoft.budgetit.entities.UserAccount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor @AllArgsConstructor
-public class PostCreateUserAccountResponseDTO {
+public class PostCreateAccountResponseDTO {
 
     private Long accountId;
     private Long ownerId;
@@ -26,8 +26,9 @@ public class PostCreateUserAccountResponseDTO {
     private LocalDateTime modificationDate;
     private LocalDateTime removalDate;
 
-    public static PostCreateUserAccountResponseDTO fromEntity(UserAccount entity) {
-        PostCreateUserAccountResponseDTO responseDTO = new PostCreateUserAccountResponseDTO();
+    public static PostCreateAccountResponseDTO fromEntity(UserAccount entity) {
+        PostCreateAccountResponseDTO responseDTO = new PostCreateAccountResponseDTO();
+
         responseDTO.setAccountId(entity.getAccountId());
         responseDTO.setOwnerId(entity.getOwner().getUserId());
         responseDTO.setMainAccount(entity.getMainAccount());
@@ -36,7 +37,9 @@ public class PostCreateUserAccountResponseDTO {
         responseDTO.setCreationDate(entity.getCreationDate());
         responseDTO.setModificationDate(entity.getModificationDate());
         responseDTO.setRemovalDate(entity.getRemovalDate());
+
         return responseDTO;
     }
+
 
 }

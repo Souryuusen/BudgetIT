@@ -11,10 +11,12 @@ import java.math.BigDecimal;
 @NoArgsConstructor @AllArgsConstructor
 public class PostCreateAccountRequestDTO {
 
+    public Boolean mainAccount;
+
     private String name;
 
     private BigDecimal balance;
 
-    private UserEntity owner;
+    private long ownerId;
 
 }

@@ -25,6 +25,8 @@ public class UserEntity {
     @Column(name = "user_id")
     @Getter
     private long userId;
+    @Column(name = "user_main_account_id")
+    private long mainAccountId;
 
     @Column(name = "user_active")
     private Boolean active;

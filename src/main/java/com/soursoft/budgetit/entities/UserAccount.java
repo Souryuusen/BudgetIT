@@ -1,6 +1,7 @@
 package com.soursoft.budgetit.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,9 @@ public class UserAccount {
     @Getter
     private long accountId;
 
+    @Column(name = "acc_main_account")
+    private Boolean mainAccount;
+
     @Column(name = "acc_name")
     private String name;
 
@@ -40,14 +44,18 @@ public class UserAccount {
     @JoinColumn(name = "acc_owner_id", nullable = false)
     private UserEntity owner;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "sourceAccount")
     private List<AccountTransaction> sendTransactions;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "destinationAccount")
     private List<AccountTransaction> receiveTransactions;
 
     @Data
     public static class UserAccountBuilder {
+
+        private Boolean mainAccount;
 
         private String name;
 
@@ -70,6 +78,7 @@ public class UserAccount {
         public UserAccount build() {
             UserAccount result = new UserAccount();
 
+            result.setMainAccount(this.getMainAccount());
             result.setName(this.getName());
             result.setCurrentBalance(this.getCurrentBalance());
             result.setCreationDate(this.getCreationDate());
@@ -80,6 +89,12 @@ public class UserAccount {
             result.setReceiveTransactions(this.getReceivedTransactions());
 
             return result;
+        }
+
+        public UserAccountBuilder withMainAccount(Boolean mainAccount) {
+            this.setMainAccount(mainAccount);
+
+            return this;
         }
 
         public UserAccountBuilder withName(String name) {

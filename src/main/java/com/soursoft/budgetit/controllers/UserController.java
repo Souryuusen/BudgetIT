@@ -46,15 +46,11 @@ public class UserController {
         UserEntity foundUser = userService.findUserByUserId(userId);
 
         if(foundUser != null && foundUser.getActive()) {
-            UserAccount foundAccount = userAccountService.findAccountByOwnerAndName(foundUser, request.getName());
-            if(foundAccount == null) {
-                UserAccount newAccount = userAccountService.createNewAccount(foundUser, request.getName(), request.getBalance());
-                userService.updateUserTotalBalance(userId);
+            UserAccount createdAccount = userAccountService.createNewAccount(foundUser,request.getName(),
+                                            request.getBalance(), request.getMainAccount());
+            userService.updateUserTotalBalance(foundUser.getUserId());
 
-                return new ResponseEntity<>(PostCreateUserAccountResponseDTO.fromEntity(newAccount), HttpStatus.CREATED);
-            } else {
-                throw new RuntimeException("User Already Have Account With Specified Name");
-            }
+            return new ResponseEntity<>(PostCreateUserAccountResponseDTO.fromEntity(createdAccount), HttpStatus.CREATED);
         } else {
             if(foundUser != null) {
                 throw new RuntimeException("Cannot create new account for non-active user!");
@@ -64,30 +60,28 @@ public class UserController {
         }
     }
 
-    @PostMapping("/{userId}/charge")
-    public ResponseEntity<?> chargeUser(@PathVariable Long userId, @RequestBody PostChargeUserByUserIdRequestDTO request) {
-        UserEntity foundUser = userService.findUserByUserId(userId);
-
-        Long accountId = request.getAccountId();
-        if((accountId == null || accountId <= 0) && request.getDividePayment()) {
-
-        } else if(request.getAccountId() != null) {
-            if(userAccountService.isValidUserAccount(accountId)) {
-                UserAccount account = userAccountService.findAccountByAccountId(accountId);
-
-                if(userAccountService.isBalanceSufficient(account, request.getAmount())) {
-                    account.setCurrentBalance(account.getCurrentBalance().subtract(request.getAmount()));
-                } else {
-                    throw new RuntimeException("Insufficient founds on selected account.");
-                }
-            } else {
-                throw new RuntimeException("Cannot find user account connected to User with id " + request.getAccountId());
-            }
-        }
-
-        return null;
-    }
-
-//    public ResponseEntity<?>
+//    @PostMapping("/{userId}/debit")
+//    public ResponseEntity<?> chargeUser(@PathVariable Long userId, @RequestBody PostChargeUserByUserIdRequestDTO request) {
+//        UserEntity foundUser = userService.findUserByUserId(userId);
+//
+//        Long accountId = request.getAccountId();
+//        if((accountId == null || accountId <= 0) && request.getDividePayment()) {
+//
+//        } else if(request.getAccountId() != null) {
+//            if(userAccountService.isValidUserAccount(accountId)) {
+//                UserAccount account = userAccountService.findAccountByAccountId(accountId);
+//
+//                if(userAccountService.isBalanceSufficient(account, request.getAmount())) {
+//                    account.setCurrentBalance(account.getCurrentBalance().subtract(request.getAmount()));
+//                } else {
+//                    throw new RuntimeException("Insufficient founds on selected account.");
+//                }
+//            } else {
+//                throw new RuntimeException("Cannot find user account connected to User with id " + request.getAccountId());
+//            }
+//        }
+//
+//        return null;
+//    }
 
 }

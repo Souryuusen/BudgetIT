@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor @AllArgsConstructor
 public class PostCreateUserAccountRequestDTO {
 
+    private Boolean mainAccount;
+
     private String name;
 
     private BigDecimal balance;
