@@ -1,9 +1,12 @@
 package com.soursoft.budgetit.services;
 
+import com.soursoft.budgetit.entities.TransactionStatus;
+import com.soursoft.budgetit.entities.TransactionType;
 import com.soursoft.budgetit.entities.UserAccount;
 import com.soursoft.budgetit.entities.UserEntity;
 import com.soursoft.budgetit.repositories.UserAccountRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,6 +21,7 @@ public class UserAccountService {
 
     private UserAccountRepository userAccountRepository;
 
+    @Autowired
     public UserAccountService(UserAccountRepository userAccountRepository) {
         this.userAccountRepository = userAccountRepository;
     }
@@ -58,18 +62,51 @@ public class UserAccountService {
         }
     }
 
-    @Transactional
-    public BigDecimal calculateTotalBalanceByUserId(Long userId) {
-        List<UserAccount> userAccounts = userAccountRepository.findByOwnerUserId(userId);
+//    @Transactional
+//    public BigDecimal calculateTotalBalanceByUserId(Long userId) {
+//        List<UserAccount> userAccounts = userAccountRepository.findByOwnerUserId(userId);
+//
+//        if(!userAccounts.isEmpty()) {
+//            BigDecimal totalBalance = userAccounts.stream()
+//                .map(UserAccount::getCurrentBalance)
+//                .reduce(BigDecimal.ZERO, BigDecimal::add);
+//            return totalBalance;
+//        } else {
+//            return BigDecimal.ZERO;
+//        }
+//    }
 
-        if(!userAccounts.isEmpty()) {
-            BigDecimal totalBalance = userAccounts.stream()
-                .map(UserAccount::getCurrentBalance)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-            return totalBalance;
-        } else {
-            return BigDecimal.ZERO;
+    @Transactional
+    public TransactionStatus transferFunds(UserAccount source, UserAccount destination, BigDecimal value) {
+        if(!isBalanceSufficient(source, value)) {
+            return TransactionStatus.REJECTED;
         }
+
+        source.setCurrentBalance(source.getCurrentBalance().subtract(value));
+        destination.setCurrentBalance(destination.getCurrentBalance().add(value));
+
+        updateEntity(source);
+        updateEntity(destination);
+
+        return TransactionStatus.FINISHED;
+    }
+
+    @Transactional
+    public TransactionStatus correctAccountBalance(UserAccount account, BigDecimal value, TransactionType operation) {
+        if(operation != TransactionType.CREDIT && operation != TransactionType.DEBIT) {
+            throw new RuntimeException("Invalid operation type for balance correction: " + operation);
+        }
+        if(operation == TransactionType.DEBIT && !isBalanceSufficient(account, value)) {
+            return TransactionStatus.REJECTED;
+        }
+
+        switch (operation) {
+            case CREDIT -> account.setCurrentBalance(account.getCurrentBalance().add(value));
+            case DEBIT -> account.setCurrentBalance(account.getCurrentBalance().subtract(value));
+        }
+        updateEntity(account);
+
+        return TransactionStatus.FINISHED;
     }
 
     //TODO: Add proper exception for handling 'Account not found by Account Id'
@@ -94,7 +131,8 @@ public class UserAccountService {
     }
 
     public Boolean isBalanceSufficient(UserAccount account, BigDecimal amountToCharge) {
-        return account.getCurrentBalance().min(amountToCharge).compareTo(BigDecimal.ZERO) >= 0;
+        return account.getCurrentBalance().compareTo(amountToCharge) >= 0;
+//        return account.getCurrentBalance().min(amountToCharge).compareTo(BigDecimal.ZERO) >= 0;
     }
 
     public UserAccount updateEntity(UserAccount entity) {

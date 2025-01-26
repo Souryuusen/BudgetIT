@@ -6,6 +6,7 @@ import com.soursoft.budgetit.entities.UserEntity;
 import com.soursoft.budgetit.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,11 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final UserAccountService userAccountService;
-
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserAccountService userAccountService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.userAccountService = userAccountService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -66,8 +64,12 @@ public class UserService {
         if(foundUserOptional.isPresent()) {
             UserEntity foundUser = foundUserOptional.get();
 
-            BigDecimal calculatedTotalBalance = userAccountService.calculateTotalBalanceByUserId(userId);
-            foundUser.setTotalBalance(calculatedTotalBalance);
+            Optional<BigDecimal> totalBalanceOptional = userRepository.getTotalBalanceByUserEntityId(foundUser.getUserId());
+            if(totalBalanceOptional.isPresent()) {
+                foundUser.setTotalBalance(totalBalanceOptional.get());
+            } else {
+                foundUser.setTotalBalance(BigDecimal.ZERO);
+            }
             updateEntity(foundUser);
 
             return foundUser;

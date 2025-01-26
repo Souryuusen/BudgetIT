@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "account_transactions")
@@ -40,6 +41,13 @@ public class AccountTransaction {
     @Column(name = "trn_type")
     private TransactionType type;
 
+    @Column(name = "trn_creation_date")
+    private LocalDateTime creationDate;
+    @Column(name = "trn_modification_date")
+    private LocalDateTime modificationDate;
+    @Column(name = "trn_removal_date")
+    private LocalDateTime removalDate;
+
     @Data
     public static class AccountTransactionBuilder {
 
@@ -51,6 +59,10 @@ public class AccountTransaction {
         private TransactionStatus status;
 
         private TransactionType type;
+
+        private LocalDateTime creationDate;
+        private LocalDateTime modificationDate;
+        private LocalDateTime removalDate;
 
         public static AccountTransactionBuilder getInstance() {
             return new AccountTransactionBuilder();
@@ -64,6 +76,9 @@ public class AccountTransaction {
             accountTransaction.setTransactionValue(this.getTransactionValue());
             accountTransaction.setStatus(this.getStatus());
             accountTransaction.setType(this.getType());
+            accountTransaction.setCreationDate(this.getCreationDate());
+            accountTransaction.setModificationDate(this.getModificationDate());
+            accountTransaction.setRemovalDate(this.getRemovalDate());
 
             return accountTransaction;
         }
@@ -94,6 +109,24 @@ public class AccountTransaction {
 
         public AccountTransactionBuilder withType(TransactionType type) {
             this.setType(type);
+
+            return this;
+        }
+
+        public AccountTransactionBuilder withCreationDate(LocalDateTime creationDate) {
+            this.setCreationDate(creationDate);
+
+            return this;
+        }
+
+        public AccountTransactionBuilder withModificationDate(LocalDateTime modificationDate) {
+            this.setModificationDate(modificationDate);
+
+            return this;
+        }
+
+        public AccountTransactionBuilder withRemovalDate(LocalDateTime removalDate) {
+            this.setRemovalDate(removalDate);
 
             return this;
         }

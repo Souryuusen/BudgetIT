@@ -24,9 +24,9 @@ public class UserEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     @Getter
-    private long userId;
+    private Long userId;
     @Column(name = "user_main_account_id")
-    private long mainAccountId;
+    private Long mainAccountId;
 
     @Column(name = "user_active")
     private Boolean active;
