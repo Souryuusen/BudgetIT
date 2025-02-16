@@ -1,7 +1,6 @@
 package com.soursoft.budgetit.controllers;
 
 import com.soursoft.budgetit.dto.users.userId.GetUserByIdResponseDTO;
-import com.soursoft.budgetit.dto.users.userId.PostChargeUserByUserIdRequestDTO;
 import com.soursoft.budgetit.dto.users.userId.PostCreateUserAccountRequestDTO;
 import com.soursoft.budgetit.dto.users.userId.PostCreateUserAccountResponseDTO;
 import com.soursoft.budgetit.entities.UserAccount;
@@ -10,7 +9,6 @@ import com.soursoft.budgetit.services.UserAccountService;
 import com.soursoft.budgetit.services.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

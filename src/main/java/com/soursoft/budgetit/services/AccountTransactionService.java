@@ -27,32 +27,37 @@ public class AccountTransactionService {
 
     // TODO: Create exceptions to handle method logic instead of RuntimeException
     public AccountTransaction processTransaction(Long transactionId) {
-        Optional<AccountTransaction> transactionOptional = repository.findById(transactionId);
+        final AccountTransaction transaction = findAccountTransactionById(transactionId);
 
-        if (transactionOptional.isPresent()) {
-            AccountTransaction transaction = transactionOptional.get();
-
-            if (transaction.getStatus() != TransactionStatus.PENDING) {
-                throw new RuntimeException("Only transaction with status 'Pending' can be processed");
-            }
-            TransactionStatus status;
-
-            UserAccount sourceAccount = transaction.getSourceAccount();
-            UserAccount destinationAccount = transaction.getDestinationAccount();
-            if (transaction.getType() == TransactionType.TRANSFER) {
-
-                status = userAccountService.transferFunds(sourceAccount, destinationAccount,
-                    transaction.getTransactionValue());
-            } else {
-                status = userAccountService.correctAccountBalance(sourceAccount, transaction.getTransactionValue(),
-                    transaction.getType());
-            }
-            transaction.setStatus(status);
-            transaction = updateEntity(transaction);
-            return transaction;
-        } else {
-            throw new RuntimeException("Transaction with id " + transactionId + "has not been found");
+        if (transaction.getStatus() != TransactionStatus.PENDING) {
+            throw new RuntimeException("Only transaction with status 'Pending' can be processed");
         }
+        TransactionStatus status;
+
+        UserAccount sourceAccount = transaction.getSourceAccount();
+        UserAccount destinationAccount = transaction.getDestinationAccount();
+        if (transaction.getType() == TransactionType.TRANSFER) {
+
+            status = userAccountService.transferFunds(sourceAccount, destinationAccount,
+                transaction.getTransactionValue());
+        } else {
+            status = userAccountService.correctAccountBalance(sourceAccount, transaction.getTransactionValue(),
+                transaction.getType());
+        }
+        transaction.setStatus(status);
+
+        return updateEntity(transaction);
+    }
+
+    public AccountTransaction cancelTransaction(Long transactionId) {
+        final AccountTransaction transaction = findAccountTransactionById(transactionId);
+        if (transaction.getStatus() != TransactionStatus.PENDING) {
+            throw new RuntimeException("Only transaction with status 'Pending' can be processed");
+        }
+
+        transaction.setStatus(TransactionStatus.CANCELED);
+
+        return updateEntity(transaction);
     }
 
     // TODO: Create custom exception for handling transaction not found by ID

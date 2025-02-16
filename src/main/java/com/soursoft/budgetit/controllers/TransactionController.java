@@ -1,5 +1,7 @@
 package com.soursoft.budgetit.controllers;
 
+import com.soursoft.budgetit.dto.transactions.PostCancelTransactionRequestDTO;
+import com.soursoft.budgetit.dto.transactions.PostCancelTransactionResponseDTO;
 import com.soursoft.budgetit.dto.transactions.PostCreateTransactionRequestDTO;
 import com.soursoft.budgetit.dto.transactions.PostCreateTransactionResponseDTO;
 import com.soursoft.budgetit.dto.transactions.PostProcessTransactionRequestDTO;
@@ -11,6 +13,7 @@ import com.soursoft.budgetit.entities.UserAccount;
 import com.soursoft.budgetit.services.AccountTransactionService;
 import com.soursoft.budgetit.services.UserAccountService;
 import com.soursoft.budgetit.services.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,13 +67,22 @@ public class TransactionController {
         return new ResponseEntity<>(PostCreateTransactionResponseDTO.fromEntity(transaction), HttpStatus.CREATED);
     }
 
+    @Transactional
     @PostMapping("/process")
     public ResponseEntity<?> processTransaction(@RequestBody PostProcessTransactionRequestDTO request) {
         AccountTransaction transaction = accountTransactionService.processTransaction(request.getTransactionId());
-
         userService.updateUserTotalBalance(transaction.getSourceAccount().getOwner().getUserId());
 
         return new ResponseEntity<>(PostProcessTransactionResponseDTO.fromEntity(transaction), HttpStatus.OK);
+    }
+
+    @Transactional
+    @PostMapping("/cancel")
+    public ResponseEntity<PostCancelTransactionResponseDTO> cancelTransaction(@RequestBody PostCancelTransactionRequestDTO request) {
+        AccountTransaction transaction = accountTransactionService.cancelTransaction(request.getTransactionId());
+        userService.updateUserTotalBalance(transaction.getSourceAccount().getOwner().getUserId());
+
+        return new ResponseEntity<>(PostCancelTransactionResponseDTO.fromEntity(transaction), HttpStatus.OK);
     }
 
 }

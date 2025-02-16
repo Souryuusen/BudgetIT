@@ -53,6 +53,10 @@ public class UserEntity {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAccount> accounts;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Budget> budgets;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshTokenEntity> refreshTokens;
 
