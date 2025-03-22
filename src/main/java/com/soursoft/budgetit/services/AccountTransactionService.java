@@ -32,17 +32,17 @@ public class AccountTransactionService {
         if (transaction.getStatus() != TransactionStatus.PENDING) {
             throw new RuntimeException("Only transaction with status 'Pending' can be processed");
         }
-        TransactionStatus status;
 
         UserAccount sourceAccount = transaction.getSourceAccount();
         UserAccount destinationAccount = transaction.getDestinationAccount();
-        if (transaction.getType() == TransactionType.TRANSFER) {
 
+        TransactionStatus status;
+        if (transaction.getType() == TransactionType.TRANSFER) {
             status = userAccountService.transferFunds(sourceAccount, destinationAccount,
-                transaction.getTransactionValue());
+                                                        transaction.getTransactionValue());
         } else {
             status = userAccountService.correctAccountBalance(sourceAccount, transaction.getTransactionValue(),
-                transaction.getType());
+                                                                transaction.getType());
         }
         transaction.setStatus(status);
 
@@ -51,6 +51,7 @@ public class AccountTransactionService {
 
     public AccountTransaction cancelTransaction(Long transactionId) {
         final AccountTransaction transaction = findAccountTransactionById(transactionId);
+
         if (transaction.getStatus() != TransactionStatus.PENDING) {
             throw new RuntimeException("Only transaction with status 'Pending' can be processed");
         }

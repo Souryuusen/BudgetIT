@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static com.soursoft.budgetit.entities.UserAccount.UserAccountBuilder;
@@ -61,20 +60,6 @@ public class UserAccountService {
             throw new RuntimeException("User Already Have Account With Specified Name");
         }
     }
-
-//    @Transactional
-//    public BigDecimal calculateTotalBalanceByUserId(Long userId) {
-//        List<UserAccount> userAccounts = userAccountRepository.findByOwnerUserId(userId);
-//
-//        if(!userAccounts.isEmpty()) {
-//            BigDecimal totalBalance = userAccounts.stream()
-//                .map(UserAccount::getCurrentBalance)
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//            return totalBalance;
-//        } else {
-//            return BigDecimal.ZERO;
-//        }
-//    }
 
     @Transactional
     public TransactionStatus transferFunds(UserAccount source, UserAccount destination, BigDecimal value) {
@@ -132,7 +117,6 @@ public class UserAccountService {
 
     public Boolean isBalanceSufficient(UserAccount account, BigDecimal amountToCharge) {
         return account.getCurrentBalance().compareTo(amountToCharge) >= 0;
-//        return account.getCurrentBalance().min(amountToCharge).compareTo(BigDecimal.ZERO) >= 0;
     }
 
     public UserAccount updateEntity(UserAccount entity) {

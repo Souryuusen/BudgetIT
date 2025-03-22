@@ -1,5 +1,6 @@
 package com.soursoft.budgetit.controllers;
 
+import com.soursoft.budgetit.dto.budgets.PostCreateUserBudgetRequestDTO;
 import com.soursoft.budgetit.dto.users.userId.GetUserByIdResponseDTO;
 import com.soursoft.budgetit.dto.users.userId.PostCreateUserAccountRequestDTO;
 import com.soursoft.budgetit.dto.users.userId.PostCreateUserAccountResponseDTO;
@@ -58,28 +59,12 @@ public class UserController {
         }
     }
 
-//    @PostMapping("/{userId}/debit")
-//    public ResponseEntity<?> chargeUser(@PathVariable Long userId, @RequestBody PostChargeUserByUserIdRequestDTO request) {
-//        UserEntity foundUser = userService.findUserByUserId(userId);
-//
-//        Long accountId = request.getAccountId();
-//        if((accountId == null || accountId <= 0) && request.getDividePayment()) {
-//
-//        } else if(request.getAccountId() != null) {
-//            if(userAccountService.isValidUserAccount(accountId)) {
-//                UserAccount account = userAccountService.findAccountByAccountId(accountId);
-//
-//                if(userAccountService.isBalanceSufficient(account, request.getAmount())) {
-//                    account.setCurrentBalance(account.getCurrentBalance().subtract(request.getAmount()));
-//                } else {
-//                    throw new RuntimeException("Insufficient founds on selected account.");
-//                }
-//            } else {
-//                throw new RuntimeException("Cannot find user account connected to User with id " + request.getAccountId());
-//            }
-//        }
-//
-//        return null;
-//    }
+    @PostMapping("/{userId}/budgets/create")
+    public ResponseEntity<?> createNewBudgetForUser(@PathVariable Long userId,
+                                                        @RequestBody PostCreateUserBudgetRequestDTO request) {
+
+
+        return null;
+    }
 
 }

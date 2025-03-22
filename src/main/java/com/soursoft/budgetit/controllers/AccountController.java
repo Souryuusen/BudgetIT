@@ -33,7 +33,7 @@ public class AccountController {
 
         if(foundUser != null && foundUser.getActive()) {
             UserAccount createdAccount = userAccountService.createNewAccount(foundUser,request.getName(),
-                request.getBalance(), request.getMainAccount());
+                                            request.getBalance(), request.getMainAccount());
             userService.updateUserTotalBalance(foundUser.getUserId());
 
             return new ResponseEntity<>(PostCreateAccountResponseDTO.fromEntity(createdAccount), HttpStatus.CREATED);
